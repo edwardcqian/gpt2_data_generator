@@ -1,0 +1,11 @@
+{
+    "model_name": "124M",
+    "seed": null,
+    "nsamples": 0,
+    "batch_size": 1,
+    "length": null,
+    "temperature": 1,
+    "top_k": 0,
+    "top_p": 1,
+    "models_dir": "models"
+}
