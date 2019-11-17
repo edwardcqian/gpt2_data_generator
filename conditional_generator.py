@@ -1,16 +1,17 @@
 import json
 import os
 import sys
+import argparse
 
 import numpy as np
 import tensorflow as tf
 
+sys.path.insert(0, 'gpt2/src/')
 
-from gpt2.src import model
-from gpt2.src import sample
-from gpt2.src import encoder
+import model
+import sample
+import encoder
 
-import argparse
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument(
@@ -56,6 +57,7 @@ class ConditionalGenerator:
         self.length = config['length']
         self.temperature = config['temperature']
         self.top_k = config['top_k']
+        self.top_p = config['top_p']
         self.models_dir = config['models_dir']
         self.save_path = save_path
 
@@ -75,12 +77,12 @@ class ConditionalGenerator:
         if self.length is None:
             self.length = self.hparams.n_ctx // 2
         elif self.length > self.hparams.n_ctx:
-            raise ValueError(('Can't get samples longer '
+            raise ValueError(('Can\'t get samples longer '
                              'than window size: {}').format(
                                 self.hparams.n_ctx
                             ))
 
-        self.sess = tf.Session(graph=tf.Graph())
+        self.sess = tf.Session()
         self.context = tf.placeholder(tf.int32, [self.batch_size, None])
         np.random.seed(self.seed)
         tf.set_random_seed(self.seed)
@@ -97,9 +99,12 @@ class ConditionalGenerator:
         ))
         saver.restore(self.sess, ckpt)
 
+    def __exit__(self):
+        self.sess.close()
+
     def save_text(self, text_list):
         file_path = input('Filename: ')
-        while not save_path:
+        while not file_path:
             print('Filename should not by empty')
             file_path = input('Filename: ')
         save_file = os.path.join(self.save_path, file_path)

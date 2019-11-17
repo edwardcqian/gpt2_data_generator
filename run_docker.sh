@@ -5,4 +5,4 @@ IMAGENAME=${2:-gpt2_cpu}
 
 docker rm -f $CONTAINERNAME
 
-docker run -i -N $CONTAINERNAME -t $IMAGENAME
+docker run -it -v ${PWD}:/workdir --name $CONTAINERNAME $IMAGENAME
