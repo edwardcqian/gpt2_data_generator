@@ -6,7 +6,7 @@ OpenAI's GPT2 is a powerful language model, so why not use it to generate some b
 - git
 
 
-## Setup 
+## Setup
 Clone gpt2 and build docker image, run `setup.sh`:
 
 For CPU
@@ -30,7 +30,7 @@ Note: the current dockerfile available in the gpt2 repo is outdated
 bash run_docker gpt2_data_generator gpt2_docker
 ```
 
-2. Start the generator, run `python conditional_generator.py`
+2. Start the generator, run `python gpt2_data_generator/conditional_generator.py`
 
     - Type in a prompt
     - When the generated data is worth saving press Y
