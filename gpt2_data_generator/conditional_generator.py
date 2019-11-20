@@ -1,26 +1,21 @@
+import argparse
 import json
 import os
-import sys
-import argparse
 
-import numpy as np
-import tensorflow as tf
-
-sys.path.insert(0, 'gpt2/src/')
-
-import model
-import sample
 import encoder
-
+import model
+import numpy as np
+import sample
+import tensorflow as tf
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument(
     '--config_path', type=str,
-    default='config/default_config.json', help='model config json path'
+    default='config/default_config.json', help='model config json path',
 )
 parser.add_argument(
     '--save_path', type=str,
-    default='data/', help='save directory'
+    default='data/', help='save directory',
 )
 
 
@@ -30,7 +25,8 @@ Interactively run the model
 :seed=None : Integer seed for random number generators, fix seed to reproduce
     results
 :nsamples=1 : Number of samples to return total
-:batch_size=1 : Number of batches (only affects speed/memory).  Must divide nsamples.
+:batch_size=1 : Number of batches (only affects speed/memory).
+                Must divide nsamples.
 :length=None : Number of tokens in generated text, if None (default), is
     determined by model hyperparameters
 :temperature=1 : Float value controlling randomness in boltzmann
@@ -62,7 +58,7 @@ class ConditionalGenerator:
         self.save_path = save_path
 
         self.models_dir = os.path.expanduser(os.path.expandvars(
-            self.models_dir
+            self.models_dir,
         ))
         if self.batch_size is None:
             self.batch_size = 1
@@ -71,16 +67,19 @@ class ConditionalGenerator:
         self.enc = encoder.get_encoder(self.model_name, self.models_dir)
         self.hparams = model.default_hparams()
         with open(os.path.join(
-                self.models_dir, self.model_name, 'hparams.json')) as f:
+                self.models_dir, self.model_name, 'hparams.json',
+        )) as f:
             self.hparams.override_from_dict(json.load(f))
 
         if self.length is None:
             self.length = self.hparams.n_ctx // 2
         elif self.length > self.hparams.n_ctx:
-            raise ValueError(('Can\'t get samples longer '
-                             'than window size: {}').format(
-                                self.hparams.n_ctx
-                            ))
+            raise ValueError((
+                'Can\'t get samples longer '
+                'than window size: {}'
+            ).format(
+                self.hparams.n_ctx,
+            ))
 
         self.sess = tf.Session()
         self.context = tf.placeholder(tf.int32, [self.batch_size, None])
@@ -90,12 +89,12 @@ class ConditionalGenerator:
             hparams=self.hparams, length=self.length,
             context=self.context,
             batch_size=self.batch_size,
-            temperature=self.temperature, top_k=self.top_k, top_p=self.top_p
+            temperature=self.temperature, top_k=self.top_k, top_p=self.top_p,
         )
 
         saver = tf.train.Saver()
         ckpt = tf.train.latest_checkpoint(os.path.join(
-            self.models_dir, self.model_name
+            self.models_dir, self.model_name,
         ))
         saver.restore(self.sess, ckpt)
 
@@ -124,16 +123,20 @@ class ConditionalGenerator:
             generated = 0
             text_list = []
             for _ in range(self.nsamples // self.batch_size):
-                out = self.sess.run(self.output, feed_dict={
-                    self.context: [context_tokens for _ in
-                                   range(self.batch_size)]
-                })[:, len(context_tokens):]
+                out = self.sess.run(
+                    self.output, feed_dict={
+                        self.context: [context_tokens for _ in
+                                       range(self.batch_size)],
+                    },
+                )[:, len(context_tokens):]
                 for i in range(self.batch_size):
                     generated += 1
                     text = self.enc.decode(out[i])
                     text_list.append(text)
-                    print('=' * 40 + ' SAMPLE ' + str(generated) + ' ' +
-                          '=' * 40)
+                    print(
+                        '=' * 40 + ' SAMPLE ' + str(generated) + ' ' +
+                        '=' * 40,
+                    )
                     print(text)
             print('=' * 80)
 
