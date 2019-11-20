@@ -5,4 +5,4 @@ IMAGENAME=${2:-gpt2_cpu}
 
 docker rm -f $CONTAINERNAME
 
-docker run -it -v ${PWD}:/workdir --name $CONTAINERNAME $IMAGENAME
+docker run -it -v ${PWD}:/workdir -e PYTHONPATH=/workdir/gpt2/src/ --name $CONTAINERNAME $IMAGENAME
