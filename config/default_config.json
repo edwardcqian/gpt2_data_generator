@@ -1,0 +1,11 @@
+{
+    "model_name": "124M",
+    "seed": null,
+    "nsamples": 20,
+    "batch_size": 1,
+    "length": 20,
+    "temperature": 1,
+    "top_k": 10,
+    "top_p": 1,
+    "models_dir": "gpt2/models"
+}
